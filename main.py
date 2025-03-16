@@ -1,8 +1,10 @@
-from fastapi import FastAPI, HTTPException, Depends
+import os
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from bson import ObjectId
-import os
+from openai import OpenAI
 load_dotenv()
 from src.db import db
 from src.schemas import Article, UpdateArticle
@@ -66,5 +68,29 @@ def delete_article(id: str):
         raise HTTPException(status_code=404, detail="Article not found")
     return {"message": "Article deleted successfully"}
 
+
+# Summarization Endpoint
+openai_api_key = os.getenv("OPENAI_API_KEY", '')
+if not openai_api_key:
+    raise Exception("OPENAI_API_KEY not set")
+client = OpenAI(api_key=openai_api_key)
+@app.post("/articles/{id}/summarize")
+def summarize_article(id: str):
+    article = collection.find_one({"_id": ObjectId(id)})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+
+    response = client.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {
+            "role": "user",
+            "content": f'Summarize this article.\n{article["description"]}'
+        }
+    ]
+)
+    summary = response.choices[0].message.content
+
+    return {"summary": summary}
 
 
