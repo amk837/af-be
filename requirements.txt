@@ -1,0 +1,8 @@
+fastapi~=0.115.11
+uvicorn
+pymongo~=4.11.2
+openai~=1.66.3
+pinecone~=6.0.2
+pydantic~=2.10.6
+dotenv~=0.9.9
+python-dotenv~=1.0.1
