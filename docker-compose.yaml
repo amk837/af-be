@@ -1,15 +1,15 @@
 version: "3.8"
 
 services:
-  api:
+  fastapi:
     build: .
+    container_name: fastapi_app
     ports:
       - "8000:8000"
-    depends_on:
-      - mongo
-    environment:
-      MONGO_URI: "mongodb://mongo:27017/article-management-system"
-
+    env_file:
+      - .env
+    volumes:
+      - .:/app
 
 volumes:
   mongo_data:
